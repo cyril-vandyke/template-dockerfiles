@@ -1,0 +1,19 @@
+FROM golang:1.13-alpine
+
+RUN apk add openssl
+
+WORKDIR /src
+
+RUN openssl genrsa -out rpsls-server.key 2048
+RUN openssl ecparam -genkey -name secp384r1 -out rpsls-server.key
+RUN openssl req -new -x509 -sha256 -subj "/C=US/ST=Oregon/L=Lake Oswego/O=Example/CN=example.com" -key rpsls-server.key -out rpsls-server.crt -days 3650
+
+COPY go.mod go.sum /src/
+RUN go mod download
+
+
+COPY . .
+
+RUN go build -o server
+
+CMD "./server"
