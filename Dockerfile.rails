@@ -1,0 +1,17 @@
+FROM ruby:2.6.3-alpine
+
+RUN apk add -U git build-base
+
+RUN gem install bundler
+
+WORKDIR /src
+COPY Gemfile Gemfile.lock /src/
+RUN bundle install
+
+COPY app.rb /src/
+COPY lib /src/lib
+COPY views /src/views
+
+EXPOSE 4568
+ENTRYPOINT [ "bundle", "exec", "ruby" ]
+CMD [ "app.rb" ]
